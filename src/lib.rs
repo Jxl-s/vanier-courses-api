@@ -1,6 +1,7 @@
 use js_sandbox::Script;
 use regex::Regex;
 use scraper::ElementRef;
+use serde::Serialize;
 
 pub const USER_AGENT: &str = "Mozilla/5.0 Chrome/96.0.4664.45 Safari/537.36";
 pub const VANIER_URL: &str = "http://vaniercollege.qc.ca/online-schedule/";
@@ -44,7 +45,7 @@ pub async fn get_sucuri_token() -> Result<String, Box<dyn std::error::Error>> {
     Ok(cookie)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize)]
 pub enum DayOfWeek {
     Monday,
     Tuesday,
@@ -55,7 +56,7 @@ pub enum DayOfWeek {
     None,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Period {
     pub day: DayOfWeek,
     pub room: String,
@@ -67,7 +68,7 @@ pub struct Period {
     pub end_minute: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Course {
     // Course information
     pub section: u16,
