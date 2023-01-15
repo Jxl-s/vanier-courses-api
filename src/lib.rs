@@ -173,8 +173,12 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
             });
 
             // 5.2: Get the time slots
-            let periods = times.split("<br>").zip(days).zip(rooms.split("<br>")).map(
-                |((time_string, day), room)| {
+            let periods = times
+                .split("<br>")
+                .zip(days)
+                .zip(rooms.split("<br>"))
+                .filter(|((time_string, _), _)| !time_string.trim().is_empty())
+                .map(|((time_string, day), room)| {
                     let room = room.trim();
                     let time_string = time_string.trim();
 
@@ -202,8 +206,7 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
                         end_hour,
                         end_minute,
                     }
-                },
-            );
+                });
 
             Course {
                 periods: periods.collect::<Vec<Period>>(),
