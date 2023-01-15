@@ -1,5 +1,3 @@
-use std::fs;
-
 use actix_web::{
     body::BoxBody, get, web::Path, App, HttpResponse, HttpServer, Responder, ResponseError,
 };
