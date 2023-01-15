@@ -220,6 +220,29 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
     Ok(courses.collect())
 }
 
+/// Gets an array of department codes
+pub async fn get_departments() -> Result<Vec<u16>, Box<dyn std::error::Error>> {
+    // Send a request to the main page
+    let sucuri_token = get_sucuri_token().await?;
+    let website_res = reqwest::Client::new()
+        .get(VANIER_URL)
+        .header("User-Agent", USER_AGENT)
+        .header("Cookie", sucuri_token)
+        .send()
+        .await?;
+
+    let website_text = website_res.text().await?;
+
+    // It's a simple table, so we can use regex to parse it instead
+    let dept_regex = Regex::new(r"\?dv=(\d+)&dt=").unwrap();
+
+    let all_departments = dept_regex
+        .captures_iter(&website_text)
+        .map(|c| c.get(1).unwrap().as_str().parse::<u16>().unwrap());
+
+    Ok(all_departments.collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -247,5 +270,11 @@ mod tests {
 
         // The section has more than a single period
         assert!(any_sec_1.periods.len() > 0);
+    }
+
+    #[tokio::test]
+    pub async fn can_get_departments() {
+        let departments = get_departments().await.expect("Failed to get departments");
+        assert!(departments.contains(&201) && departments.contains(&420)); // math and comp sci
     }
 }
