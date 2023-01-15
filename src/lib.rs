@@ -232,4 +232,20 @@ mod tests {
 
         assert!(token.starts_with("sucuri_cloudproxy_uuid_"));
     }
+
+    #[tokio::test]
+    pub async fn can_get_courses() {
+        let courses = get_courses(201) // math
+            .await
+            .expect("Failed to get courses");
+
+        // Can find a course with section 1
+        let any_sec_1 = courses
+            .iter()
+            .find(|&c| c.section == 1)
+            .expect("Failed to find Calculus I");
+
+        // The section has more than a single period
+        assert!(any_sec_1.periods.len() > 0);
+    }
 }
