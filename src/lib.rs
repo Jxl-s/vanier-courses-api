@@ -45,7 +45,7 @@ pub async fn get_sucuri_token() -> Result<String, Box<dyn std::error::Error>> {
     Ok(cookie)
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DayOfWeek {
     Monday,
     Tuesday,
@@ -108,7 +108,6 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
     let tr_list = document
         .select(&tr_selector)
         .filter(|f| f.children().count() == 21)
-        .filter(|f| !f.inner_html().contains("#FFFF66"))
         .skip(1);
 
     // For each table element, get the course element
@@ -119,7 +118,7 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
         // 1. The section, remove trailing 0's and convert to u16
         let section: String = columns.get(0).unwrap().text().collect();
         let section: u16 = section
-            .trim_end_matches('0')
+            .trim_start_matches('0')
             .parse()
             .expect("Failed to parse section");
 
@@ -172,12 +171,22 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
                 _ => DayOfWeek::None,
             });
 
-            // 5.2: Get the time slots
+            // 5.2: Get the time slots, remove the duplicate days
             let periods = times
                 .split("<br>")
                 .zip(days)
                 .zip(rooms.split("<br>"))
-                .filter(|((time_string, _), _)| !time_string.trim().is_empty())
+                .filter(|((time_string, day), room)| {
+                    if time_string.trim().is_empty() || room.trim().is_empty() {
+                        return false;
+                    }
+
+                    if let DayOfWeek::None = day {
+                        return false;
+                    }
+
+                    return true;
+                })
                 .map(|((time_string, day), room)| {
                     let room = room.trim();
                     let time_string = time_string.trim();
@@ -208,8 +217,12 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
                     }
                 });
 
+            // remove the duplicate days in the periods
+            let mut periods = periods.collect::<Vec<Period>>();
+            periods.dedup_by(|a, b| a.day == b.day);
+
             Course {
-                periods: periods.collect::<Vec<Period>>(),
+                periods,
                 section,
 
                 teacher: teacher.to_string(),
@@ -222,7 +235,7 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
         }
     });
 
-    Ok(courses.collect())
+    Ok(courses.filter(|c| c.periods.len() > 0).collect())
 }
 
 /// Gets an array of department codes

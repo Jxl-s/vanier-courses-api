@@ -78,7 +78,7 @@ function CourseDisplay({ course, data, onSectionChange, onDelete }: CourseDispla
 }
 
 export default function Schedules() {
-    const [courseData, setCourseData] = useState<Map<string, CourseData[]>>();
+    const [courseData, setCourseData] = useState<Map<string, CourseData[]>>(new Map());
 
     const [currentCourses, setCurrentCourses] = useState<
         {
@@ -146,6 +146,114 @@ export default function Schedules() {
         setIsFetchingData(false);
     }
 
+    function getValidDispositions() {
+        const coursesToTry: CourseData[][] = [];
+
+        for (const course of currentCourses) {
+            const data = courseData.get(course.course);
+
+            if (course.section !== -1) {
+                // insert the current section into the courses to try
+                const sectionCourse = data?.filter((section) => section.section === course.section);
+
+                if (sectionCourse) {
+                    coursesToTry.push(sectionCourse);
+                    continue;
+                }
+            }
+
+            // Since it's -1, we try all the sections
+            coursesToTry.push(data ?? []);
+        }
+
+        // Find all the permutations of the courses to try. the total
+        // number of permutations is the product of the lengths of each
+        // array in coursesToTry
+        const cartesianProduct = <T extends any>(arrays: T[][]) => {
+            const result: any[][] = [];
+
+            const helper = (arr: any[], i: number) => {
+                for (let j = 0; j < arrays[i].length; j++) {
+                    const a = arr.slice(0);
+                    a.push(arrays[i][j]);
+                    if (i === arrays.length - 1) {
+                        result.push(a);
+                    } else {
+                        helper(a, i + 1);
+                    }
+                }
+            };
+
+            helper([], 0);
+
+            return result;
+        };
+
+        const permutations = cartesianProduct(coursesToTry) as CourseData[][];
+
+        // Find which permutations are valid
+        const dayToInt = (day: string) => {
+            switch (day) {
+                case "Monday":
+                    return 0;
+                case "Tuesday":
+                    return 1;
+                case "Wednesday":
+                    return 2;
+                case "Thursday":
+                    return 3;
+                case "Friday":
+                    return 4;
+                default:
+                    return -1;
+            }
+        };
+
+        const timeToInt = (hours: number, minutes: number) => {
+            return hours * 60 + minutes;
+        };
+
+        const validPermutations = permutations.filter((permutation) => {
+            // Check if there are any overlapping periods
+            let days: { start: number; end: number }[][] = [];
+
+            for (let i = 0; i < 5; i++) {
+                days.push([]);
+            }
+
+            let isValid = true;
+
+            for (const course of permutation) {
+                for (const period of course.periods) {
+                    // Try adding each period of the course to the day
+                    const day = dayToInt(period.day);
+                    const daySlots = days[day];
+
+                    const startTime = timeToInt(period.start_hour, period.start_minute);
+                    const endTime = timeToInt(period.end_hour, period.end_minute);
+
+                    // find if it collides
+                    for (const slot of daySlots) {
+                        if (startTime < slot.end && endTime > slot.start) {
+                            isValid = false;
+                            break;
+                        }
+                    }
+
+                    // if it's valid, we push it in
+                    daySlots.push({
+                        start: startTime,
+                        end: endTime,
+                    });
+                }
+            }
+
+            return isValid;
+        });
+
+        return validPermutations;
+    }
+
     return (
         <MainLayout>
             <div className="grid grid-cols-2">
@@ -181,7 +289,7 @@ export default function Schedules() {
                         </p>
                         <div>
                             {currentCourses.map((course, i) => {
-                                const data = courseData?.get(course.course);
+                                const data = courseData.get(course.course);
 
                                 return (
                                     <CourseDisplay
@@ -203,14 +311,17 @@ export default function Schedules() {
                                 );
                             })}
                         </div>
+                        <p className="opacity-50">
+                            There are currently{" "}
+                            {currentCourses.length > 0 ? getValidDispositions().length : 0} possible
+                            schedule(s)
+                        </p>
                         <Button variant="solid" color="primary" className="w-full mt-2">
-                            View All Combinations
+                            View All Schedules
                         </Button>
                     </div>
                 </div>
-                <div className="col-span-2">
-                    <h1>schedule should be here</h1>
-                </div>
+                <div className="w-full col-span-2 xl:col-span-1"></div>
             </div>
         </MainLayout>
     );
