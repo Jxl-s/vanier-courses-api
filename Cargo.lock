@@ -734,16 +734,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "schedule-builder"
-version = "0.1.0"
-dependencies = [
- "js-sandbox",
- "regex",
- "reqwest",
- "tokio",
-]
-
-[[package]]
 name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1018,6 +1008,16 @@ dependencies = [
  "idna",
  "percent-encoding",
  "serde",
+]
+
+[[package]]
+name = "vanier-courses-api"
+version = "0.1.0"
+dependencies = [
+ "js-sandbox",
+ "regex",
+ "reqwest",
+ "tokio",
 ]
 
 [[package]]
