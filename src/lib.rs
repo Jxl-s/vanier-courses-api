@@ -77,6 +77,10 @@ pub struct Course {
     // Teacher information
     pub teacher: String,
     pub periods: Vec<Period>,
+
+    // Other information
+    pub available_seats: u8,
+    pub recently_changed: bool,
 }
 
 /// Fetch the courses of a certain course department
@@ -128,6 +132,16 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
         // 4. The teacher, IN CASE OF MULTIPLE TEACHERS, WE GET THE FIRST ONE
         let teacher: String = columns.get(6).unwrap().text().collect();
         let teacher = teacher.split('\n').next().unwrap().trim();
+
+        // Other information, such as recent change and available seats
+        let recently_changed = columns.get(0).unwrap().value().attr("bgcolor") == Some("#FFDDDD");
+        let available_seats: u8 = columns
+            .get(10)
+            .unwrap()
+            .text()
+            .collect::<String>()
+            .parse()
+            .unwrap_or(0);
 
         // 5. The periods, this will be more tricky
         {
@@ -189,14 +203,16 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
                 },
             );
 
-            let periods: Vec<Period> = periods.collect();
             Course {
-                periods,
+                periods: periods.collect::<Vec<Period>>(),
                 section,
 
                 teacher: teacher.to_string(),
                 course: course.to_string(),
                 title: title.to_string(),
+
+                recently_changed,
+                available_seats,
             }
         }
     });
