@@ -23,7 +23,9 @@ pub struct ErrResponse {
 // Implementations
 impl ResponseError for ErrResponse {
     fn error_response(&self) -> HttpResponse<BoxBody> {
-        HttpResponse::build(self.status_code()).json(self)
+        HttpResponse::build(self.status_code())
+            .content_type("application/json; charset=utf-8")
+            .json(self)
     }
 
     fn status_code(&self) -> StatusCode {
@@ -33,7 +35,9 @@ impl ResponseError for ErrResponse {
 
 impl<T: Serialize> Responder for OkResponse<T> {
     fn respond_to(self, _: &actix_web::HttpRequest) -> HttpResponse<Self::Body> {
-        HttpResponse::build(StatusCode::from_u16(self.code).unwrap()).json(self)
+        HttpResponse::build(StatusCode::from_u16(self.code).unwrap())
+            .content_type("application/json; charset=utf-8")
+            .json(self)
     }
 
     type Body = BoxBody;
