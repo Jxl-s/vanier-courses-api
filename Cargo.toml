@@ -1,0 +1,12 @@
+[package]
+name = "schedule-builder"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+js-sandbox = "0.1.6"
+regex = "1.7.1"
+reqwest = { version = "0.11.13", features = ["blocking"] }
+tokio = { version = "1.24.1", features = ["full"] }
