@@ -110,7 +110,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .service(api_get_department_courses)
             .service(api_get_courses)
             .service(
-                actix_files::Files::new("/", "./static")
+                actix_files::Files::new("/", "./frontend/dist")
                     .show_files_listing()
                     .index_file("index.html"),
             )
