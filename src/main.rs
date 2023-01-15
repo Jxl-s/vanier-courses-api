@@ -1,8 +1,11 @@
-use vanier_courses_api::{get_courses, get_departments};
+use actix_web::{App, HttpServer};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let courses = get_departments().await?;
-    println!("{:#?}", courses);
+    HttpServer::new(|| App::new())
+        .bind(("0.0.0.0", 8080))?
+        .run()
+        .await?;
+
     Ok(())
 }
