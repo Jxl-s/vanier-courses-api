@@ -108,9 +108,10 @@ async fn api_get_courses(course_code: Path<String>) -> Res<Vec<Course>> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let port = std::env::var("PORT").unwrap_or(8080.to_string());
+
     HttpServer::new(|| {
         App::new()
-            // .wrap(Cors::default().allowed_origin("http://192.168.1.171:5173"))
             .service(api_get_departments)
             .service(api_get_department_courses)
             .service(api_get_courses)
@@ -120,7 +121,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .index_file("index.html"),
             )
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", port.parse().unwrap()))?
     .run()
     .await?;
 
