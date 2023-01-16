@@ -111,7 +111,7 @@ async fn api_get_courses(course_code: Path<String>) -> Res<Vec<Course>> {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     HttpServer::new(|| {
         App::new()
-            .wrap(Cors::default().allowed_origin("http://192.168.1.171:5173"))
+            // .wrap(Cors::default().allowed_origin("http://192.168.1.171:5173"))
             .service(api_get_departments)
             .service(api_get_department_courses)
             .service(api_get_courses)

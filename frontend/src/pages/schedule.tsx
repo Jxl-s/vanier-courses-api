@@ -101,7 +101,7 @@ export default function Schedules() {
         setIsFetchingData(true);
 
         // Fetch the course data from the API
-        const res = await fetch("http://192.168.1.171:8080/api/courses/" + inputCourseCode);
+        const res = await fetch("/api/courses/" + inputCourseCode);
         if (res.status !== 200) {
             console.log("error");
             setIsFetchingData(false);

@@ -17,3 +17,6 @@ tokio = { version = "1.24.1", features = ["full"] }
 derive_more = "0.99.17"
 actix-files = "0.6.2"
 actix-cors = "0.6.4"
+
+[profile.release]
+strip = true
