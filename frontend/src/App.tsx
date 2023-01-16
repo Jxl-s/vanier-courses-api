@@ -1,8 +1,4 @@
-import { useState } from "react";
 import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
-import reactLogo from "./assets/react.svg";
-import MainLayout from "./layouts/main";
-import Index from "./pages";
 import Schedules from "./pages/schedule";
 
 function App() {
@@ -10,8 +6,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/">
-                    <Route index element={<Index />} />
-                    <Route path="schedule" element={<Schedules />} />
+                    <Route index element={<Schedules />} />
                 </Route>
             </Routes>
         </BrowserRouter>

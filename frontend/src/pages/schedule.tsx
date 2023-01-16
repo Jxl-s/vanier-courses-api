@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "../components/interactive/Button";
 import Input from "../components/interactive/Input";
 import List from "../components/interactive/List";
+import Schedule, { dayToInt } from "../components/Schedule";
 import MainLayout from "../layouts/main";
 
 interface CourseData {
@@ -192,22 +193,6 @@ export default function Schedules() {
         const permutations = cartesianProduct(coursesToTry) as CourseData[][];
 
         // Find which permutations are valid
-        const dayToInt = (day: string) => {
-            switch (day) {
-                case "Monday":
-                    return 0;
-                case "Tuesday":
-                    return 1;
-                case "Wednesday":
-                    return 2;
-                case "Thursday":
-                    return 3;
-                case "Friday":
-                    return 4;
-                default:
-                    return -1;
-            }
-        };
 
         const timeToInt = (hours: number, minutes: number) => {
             return hours * 60 + minutes;
@@ -254,12 +239,23 @@ export default function Schedules() {
         return validPermutations;
     }
 
+    const currentCombinations = currentCourses.length > 0 ? getValidDispositions() : [];
+    const [combIdx, setCombIdx] = useState(1);
+
+    const nextComb = () => {
+        setCombIdx((prev) => Math.min(currentCombinations.length, prev + 1));
+    };
+
+    const prevComb = () => {
+        setCombIdx((prev) => Math.max(1, prev - 1));
+    };
+
     return (
         <MainLayout>
             <div className="grid grid-cols-2">
                 <div className="w-full col-span-2 xl:col-span-1">
                     <div>
-                        <p className="text-2xl pb-1 border-zinc-500 border-b mb-4">
+                        <p className="text-2xl pb-1 border-zinc-500 border-b mb-2 text-center">
                             Course Selector
                         </p>
                         <div>
@@ -284,7 +280,7 @@ export default function Schedules() {
                         </div>
                     </div>
                     <div className="mt-4">
-                        <p className="text-2xl pb-1 border-zinc-500 border-b mb-4">
+                        <p className="text-2xl pb-1 border-zinc-500 border-b mb-2 text-center">
                             Current Courses
                         </p>
                         <div>
@@ -312,16 +308,41 @@ export default function Schedules() {
                             })}
                         </div>
                         <p className="opacity-50">
-                            There are currently{" "}
-                            {currentCourses.length > 0 ? getValidDispositions().length : 0} possible
-                            schedule(s)
+                            There are currently {currentCombinations.length} possible schedule(s)
                         </p>
-                        <Button variant="solid" color="primary" className="w-full mt-2">
-                            View All Schedules
-                        </Button>
                     </div>
                 </div>
-                <div className="w-full col-span-2 xl:col-span-1"></div>
+                <div className="w-full col-span-2 xl:col-span-1 mt-2 xl:mt-0">
+                    <p className="text-2xl pb-1 border-zinc-500 border-b mb-2 text-center">
+                        Schedule Visualizer
+                    </p>
+                    <div className="w-10/12 mx-auto">
+                        <Schedule data={currentCombinations[combIdx - 1] ?? []} />
+                        <div className="mt-2 grid grid-cols-3">
+                            <Button
+                                variant="solid"
+                                color="primary"
+                                className="w-full"
+                                disabled={combIdx <= 1}
+                                onClick={prevComb}
+                            >
+                                {"Previous"}
+                            </Button>
+                            <p className="text-center my-auto">
+                                Schedule {combIdx} of {currentCombinations.length}
+                            </p>
+                            <Button
+                                variant="solid"
+                                color="primary"
+                                className="w-full"
+                                disabled={combIdx >= currentCombinations.length}
+                                onClick={nextComb}
+                            >
+                                {"Next"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </MainLayout>
     );
