@@ -1,4 +1,3 @@
-use actix_cors::Cors;
 use actix_web::{
     body::BoxBody, get, web::Path, App, HttpResponse, HttpServer, Responder, ResponseError,
 };
