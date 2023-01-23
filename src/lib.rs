@@ -107,7 +107,7 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
 
     let tr_list = document
         .select(&tr_selector)
-        .filter(|f| f.children().count() == 21)
+        .filter(|f| f.children().count() >= 15)
         .skip(1);
 
     // For each table element, get the course element
