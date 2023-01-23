@@ -19,3 +19,4 @@ actix-files = "0.6.2"
 
 [profile.release]
 strip = true
+opt-level = "z"

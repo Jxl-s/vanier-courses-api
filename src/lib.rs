@@ -80,7 +80,7 @@ pub struct Course {
     pub periods: Vec<Period>,
 
     // Other information
-    pub available_seats: u8,
+    // pub available_seats: u8,
     pub recently_changed: bool,
 }
 
@@ -136,13 +136,13 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
 
         // Other information, such as recent change and available seats
         let recently_changed = columns.get(0).unwrap().value().attr("bgcolor") == Some("#FFDDDD");
-        let available_seats: u8 = columns
-            .get(10)
-            .unwrap()
-            .text()
-            .collect::<String>()
-            .parse()
-            .unwrap_or(0);
+        // let available_seats: u8 = columns
+        //     .get(10)
+        //     .unwrap()
+        //     .text()
+        //     .collect::<String>()
+        //     .parse()
+        //     .unwrap_or(0);
 
         // 5. The periods, this will be more tricky
         {
@@ -230,7 +230,7 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
                 title: title.to_string(),
 
                 recently_changed,
-                available_seats,
+                // available_seats,
             }
         }
     });
