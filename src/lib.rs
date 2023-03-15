@@ -97,7 +97,7 @@ pub async fn get_courses(department: u16) -> Result<Vec<Course>, Box<dyn std::er
         .await?;
 
     // Perform web scraping
-    let website_text = website_res.text().await?;
+    let website_text = website_res.text_with_charset("ISO-8859-1").await?;
     let document = scraper::Html::parse_document(&website_text);
 
     // select all the <tr> that contain exactly 11 children
