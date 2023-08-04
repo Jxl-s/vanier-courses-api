@@ -1,10 +1,4 @@
 # Vanier Real-Time Schedule API
+Made using rust, does not work anymore due to the master schedule being removed.
 
-This is a simple API that returns the Vanier College's master course schedule in JSON format.
-
-API was programmed using Rust, and the frontend in React
-
-It bypasses sucuri and returns the data in a usable format.
-
-Deployed website can be found here:
-https://vanier-schedule-builder.onrender.com/ (takes a while to load)
+Demo of the website can be found here: https://vanier-schedule-maker-2.vercel.app/
